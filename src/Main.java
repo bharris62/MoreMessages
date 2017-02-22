@@ -6,6 +6,8 @@ import spark.template.mustache.MustacheTemplateEngine;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static spark.Spark.halt;
+
 
 public class Main {
     static HashMap<String, User> users = new HashMap<>();
@@ -18,7 +20,6 @@ public class Main {
                     Session session = request.session();
                     String name = session.attribute("userName");
                     User user = users.get(name);
-
                     if(user == null){
                         return new ModelAndView(m, "login.html");
                     }else{
@@ -31,14 +32,16 @@ public class Main {
             String name = request.queryParams("loginName");
             String password = request.queryParams("passWord");
             name = name.substring(0,1).toUpperCase() + name.substring(1);
+            Session session = request.session();
             if(users.containsKey(name)){
                 if(! users.get(name).passWord.equals(password)){
+                    users.get(name).failLogin = true;
                     response.redirect("/");
                     return "";
                 }
             }
             users.putIfAbsent(name, new User(name, password));
-            Session session = request.session();
+
             session.attribute("userName", name);
             response.redirect("/");
             return "";

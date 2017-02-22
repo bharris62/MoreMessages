@@ -45,7 +45,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
-
         }
 
     </style>
@@ -58,19 +57,19 @@
 </ul>
 <h1>Welcome to MicroBlog, {{name}}</h1>
 
-<form action="/delete" method="post">
-    <input type="number" name="toDelete" style="padding-left:50px;" placeholder="Delete Number"/>
+<form style="float:right; padding-right: 44px;" action="/delete" method="post">
+    <input type="number" name="toDelete" placeholder="# to Delete"/>
     <button type="submit">Delete</button>
 </form>
-<form  action="/messages" method="post">
-    <input class="textBox" type="text" name="message" placeholder="Enter New Message..."/>
-    <button type="submit">Update</button>
+<form action="/messages" method="post">
+    <input style="width: 84%;"  class="textBox" type="text" name="message" placeholder="Enter New Message..."/>
+    <button style=" height:45px; width: 40px;" type="submit">Add</button>
 </form>
 
 <form action="/edit" method="post">
-    <input type="number" name="toEdit" placeholder="#" style="height:50px; width:50px;"/>
-    <input class="textBox" type="text" name="editText" placeholder="New Text..." />
-    <button type="submit">Update</button>
+    <input type="number" name="toEdit" placeholder="#" style="height:45px; width:50px;"/>
+    <input class="textBox" type="text" name="editText" placeholder="Select item to left to update, add text here..." />
+    <button style=" height:45px;" type="submit">Update</button>
 </form>
 <div>
         <ol>
