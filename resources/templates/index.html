@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login to HelloSpark</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        #page-wrap {
+            text-align: center;
+            width: 800px;
+            margin: 0 auto;
+        }
+
+    </style>
+    <script>
+        function validateForm() {
+            var x = document.forms["loginForm"]["loginName"].value;
+            if (x == "") {
+                alert("WHOOAAAAA THERE, You gotta enter a name!");
+                return false;
+            }
+        }
+    </script>
+</head>
+<body id="page-wrap">
+<h1>Welcome Stranger, Login to MicroBlog</h1>
+<form name ="loginForm" onsubmit="return validateForm()" action="/index" method="post">
+    <input   type="text" placeholder="Enter the name" name="loginName" style="font-size:18pt;height:40px;width:500px;" />
+    <button style="height:30px;width:506px;" class="button" type="submit">Login</button>
+</form>
+
+</body>
+</html>
