@@ -12,21 +12,8 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <style>
-        input[type=text] {
-            width: 250px;
-            box-sizing: border-box;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            padding: 12px 20px 12px 40px;
-            -webkit-transition: width 0.4s ease-in-out;
-            transition: width 0.4s ease-in-out;
-        }
 
-        input[type=text]:focus {
-            width: 100%;
-        }
-        h1 {
+        * {
             text-align: center;
         }
         #page-wrap {
@@ -34,22 +21,67 @@
             width: 800px;
             margin: 0 auto;
         }
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        .textBox{
+            width: 80%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+
+        }
+
     </style>
 </head>
 <body id="page-wrap">
+<ul>
+    <form action="/logout" method="post">
+    <button type="submit" style="float:right">Logout</button>
+    </form>
+</ul>
 <h1>Welcome to MicroBlog, {{name}}</h1>
 
+<form action="/delete" method="post">
+    <input type="number" name="toDelete" style="padding-left:50px;" placeholder="Delete Number"/>
+    <button type="submit">Delete</button>
+</form>
 <form  action="/messages" method="post">
-    <input type="text" name="message" placeholder="Enter Message...">
+    <input class="textBox" type="text" name="message" placeholder="Enter New Message..."/>
+    <button type="submit">Update</button>
+</form>
+
+<form action="/edit" method="post">
+    <input type="number" name="toEdit" placeholder="#" style="height:50px; width:50px;"/>
+    <input class="textBox" type="text" name="editText" placeholder="New Text..." />
+    <button type="submit">Update</button>
 </form>
 <div>
-    <ol>
-        {{#message}}
+        <ol>
+        {{#messages}}
+
             <h3>
                 <li>{{text}}</li>
             </h3>
-        {{/message}}
-    </ol>
+
+        {{/messages}}
+        <ol>
 
 </div>
 

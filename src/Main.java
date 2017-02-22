@@ -1,4 +1,5 @@
 import spark.ModelAndView;
+import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
@@ -7,36 +8,83 @@ import java.util.HashMap;
 
 
 public class Main {
-    static User user;
-    static ArrayList<Message> messages = new ArrayList<>();
+    static HashMap<String, User> users = new HashMap<>();
 
     public static void main(String[] args) {
         Spark.init();
         Spark.get("/",
                 (request, response) -> {
-                    HashMap<String, Object> m = new HashMap();
+                    HashMap m = new HashMap();
+                    Session session = request.session();
+                    String name = session.attribute("userName");
+                    User user = users.get(name);
+
                     if(user == null){
-                        return new ModelAndView(m, "index.html");
+                        return new ModelAndView(m, "login.html");
                     }else{
-                        m.put("name", user.name);
-                        m.put("message", messages);
-                        return new ModelAndView(m, "messages.html");
+                        return new ModelAndView(user, "messages.html");
                     }
                 },
                 new MustacheTemplateEngine());
 
-        Spark.post("/index", (request, response) -> {
+        Spark.post("/login", (request, response) -> {
             String name = request.queryParams("loginName");
+            String password = request.queryParams("passWord");
             name = name.substring(0,1).toUpperCase() + name.substring(1);
-            user = new User(name);
+            if(users.containsKey(name)){
+                if(! users.get(name).passWord.equals(password)){
+                    response.redirect("/");
+                    return "";
+                }
+            }
+            users.putIfAbsent(name, new User(name, password));
+            Session session = request.session();
+            session.attribute("userName", name);
             response.redirect("/");
             return "";
         });
 
         Spark.post("/messages", (request, response) -> {
+            Session session = request.session();
+            String name = session.attribute("userName");
+            User user = users.get(name);
+            if (user == null) {
+                throw new Exception("User is not logged in");
+            }
+
             String text = request.queryParams("message");
             Message message = new Message(text);
-            messages.add(message);
+            user.messages.add(message);
+            response.redirect("/");
+            return "";
+        });
+
+        Spark.post("/logout", (request, response) -> {
+            Session session = request.session();
+            session.invalidate();
+            response.redirect("/");
+            return "";
+        });
+
+        Spark.post("/delete", (request, response) -> {
+            int num = Integer.parseInt(request.queryParams("toDelete"));
+            Session session = request.session();
+            String name = session.attribute("userName");
+            User user = users.get(name);
+            user.messages.remove(num -1);
+            response.redirect("/");
+
+            return "";
+        });
+
+        Spark.post("/edit", (request, response)->{
+            int num = Integer.parseInt(request.queryParams("toEdit"));
+            String text = request.queryParams("editText");
+            Session session = request.session();
+            String name = session.attribute("userName");
+            User user = users.get(name);
+            Message newMessage = new Message(text);
+            user.messages.set(num - 1, newMessage );
             response.redirect("/");
             return "";
         });
