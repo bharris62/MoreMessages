@@ -29,6 +29,7 @@ public class Main {
     }
 
     static UserControl userControl = new UserControl();
+
     public static void main(String[] args) {
         Spark.init();
         Spark.get("/",
@@ -151,16 +152,12 @@ public class Main {
         fw.close();
     }
 
-    static boolean checkIfEmpty(String text){
-        if(text.isEmpty()){
-            return true;
-        }else return false;
+    static boolean checkIfEmpty(String text) {
+        return text.isEmpty();
     }
 
     static boolean checkIfEmpty(String text1, String text2){
-        if(text1.isEmpty() || text2.isEmpty()){
-            return true;
-        }else return false;
+        return (text1.isEmpty() || text2.isEmpty());
     }
 }
 
