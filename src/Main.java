@@ -89,7 +89,12 @@ public class Main {
         });
 
         Spark.post("/delete", (request, response) -> {
-            int num = Integer.parseInt(request.queryParams("toDelete"));
+            String toDelete = request.queryParams("toDelete");
+            if(checkIfEmpty(toDelete)){
+                response.redirect("/");
+                return "";
+            }
+            int num = Integer.parseInt(toDelete);
             Session session = request.session();
             String name = session.attribute("userName");
             User user = UserControl.users.get(name);
@@ -137,9 +142,9 @@ public class Main {
     }
 
     static boolean checkIfEmpty(String text){
-        if(text == null){
-            return false;
-        }else return true;
+        if(text.isEmpty()){
+            return true;
+        }else return false;
     }
 }
 
