@@ -1,25 +1,41 @@
+import jodd.json.JsonParser;
+import jodd.json.JsonSerializer;
 import spark.ModelAndView;
 import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
-
-import static spark.Spark.halt;
-
+import java.util.Scanner;
 
 public class Main {
-    static HashMap<String, User> users = new HashMap<>();
+    static UserControl userControl = new UserControl();
+    static class UserControl {
+        static HashMap<String, User> users = new HashMap<>();
+
+        public static HashMap<String, User> getUsers() {
+            return users;
+        }
+
+        public static void setUsers(HashMap<String, User> users) {
+            UserControl.users = users;
+        }
+    }
+
 
     public static void main(String[] args) {
         Spark.init();
         Spark.get("/",
                 (request, response) -> {
                     HashMap m = new HashMap();
+                    loadMessages();
                     Session session = request.session();
                     String name = session.attribute("userName");
-                    User user = users.get(name);
+                    User user = userControl.users.get(name);
                     if(user == null){
                         return new ModelAndView(m, "login.html");
                     }else{
@@ -33,16 +49,16 @@ public class Main {
             String password = request.queryParams("passWord");
             name = name.substring(0,1).toUpperCase() + name.substring(1);
             Session session = request.session();
-            if(users.containsKey(name)){
-                if(! users.get(name).passWord.equals(password)){
-                    users.get(name).failLogin = true;
+            if(UserControl.users.containsKey(name)){
+                if(! UserControl.users.get(name).passWord.equals(password)){
                     response.redirect("/");
                     return "";
                 }
             }
-            users.putIfAbsent(name, new User(name, password));
+            UserControl.users.putIfAbsent(name, new User(name, password));
 
             session.attribute("userName", name);
+            saveFile();
             response.redirect("/");
             return "";
         });
@@ -50,7 +66,7 @@ public class Main {
         Spark.post("/messages", (request, response) -> {
             Session session = request.session();
             String name = session.attribute("userName");
-            User user = users.get(name);
+            User user = UserControl.users.get(name);
             if (user == null) {
                 throw new Exception("User is not logged in");
             }
@@ -58,6 +74,7 @@ public class Main {
             String text = request.queryParams("message");
             Message message = new Message(text);
             user.messages.add(message);
+            saveFile();
             response.redirect("/");
             return "";
         });
@@ -73,8 +90,9 @@ public class Main {
             int num = Integer.parseInt(request.queryParams("toDelete"));
             Session session = request.session();
             String name = session.attribute("userName");
-            User user = users.get(name);
+            User user = UserControl.users.get(name);
             user.messages.remove(num -1);
+            saveFile();
             response.redirect("/");
 
             return "";
@@ -85,12 +103,35 @@ public class Main {
             String text = request.queryParams("editText");
             Session session = request.session();
             String name = session.attribute("userName");
-            User user = users.get(name);
+            User user = UserControl.users.get(name);
             Message newMessage = new Message(text);
             user.messages.set(num - 1, newMessage );
+            saveFile();
             response.redirect("/");
             return "";
         });
+    }
+
+    private static void loadMessages() throws FileNotFoundException {
+        File f = new File("messages.json");
+        Scanner scanner = new Scanner(f);
+        String contents = scanner.nextLine();
+        scanner.close();
+        JsonParser p = new JsonParser();
+        userControl =  p.parse(contents, UserControl.class);
+    }
+
+    public static void saveFile() throws IOException {
+        JsonSerializer serializer = new JsonSerializer();
+        String json = serializer
+                .include("*")
+                .serialize(UserControl.users);
+
+        File f = new File("messages.json");
+        FileWriter fw = new FileWriter(f);
+
+        fw.write(json);
+        fw.close();
     }
 }
 

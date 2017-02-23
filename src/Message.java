@@ -7,4 +7,12 @@ public class Message {
     public Message(String message) {
         this.text = message;
     }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }
