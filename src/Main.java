@@ -74,6 +74,10 @@ public class Main {
             }
 
             String text = request.queryParams("message");
+            if(checkIfEmpty(text)){
+                response.redirect("/");
+                return "";
+            }
             Message message = new Message(text);
             user.messages.add(message);
             saveFile();
@@ -106,8 +110,14 @@ public class Main {
         });
 
         Spark.post("/edit", (request, response)->{
-            int num = Integer.parseInt(request.queryParams("toEdit"));
+            String toEdit = request.queryParams("toEdit");
             String text = request.queryParams("editText");
+
+            if(checkIfEmpty(toEdit,text)){
+                response.redirect("/");
+                return "";
+            }
+            int num = Integer.parseInt(toEdit);
             Session session = request.session();
             String name = session.attribute("userName");
             User user = UserControl.users.get(name);
@@ -143,6 +153,12 @@ public class Main {
 
     static boolean checkIfEmpty(String text){
         if(text.isEmpty()){
+            return true;
+        }else return false;
+    }
+
+    static boolean checkIfEmpty(String text1, String text2){
+        if(text1.isEmpty() || text2.isEmpty()){
             return true;
         }else return false;
     }
