@@ -5,6 +5,8 @@ public class User {
     String passWord;
     ArrayList<Message> messages = new ArrayList<>();
 
+    public User(){}
+
     public User(String name, String passWord) {
         this.name = name;
         this.passWord = passWord;

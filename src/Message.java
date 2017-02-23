@@ -4,6 +4,8 @@
 public class Message {
     String text;
 
+    public Message(){}
+
     public Message(String message) {
         this.text = message;
     }
